@@ -2,53 +2,40 @@
 
 namespace Dino\Play;
 
-
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Routing\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+Use Symfony\Component\Stopwatch\Microtime;
 
 require __DIR__.'/../vendor/autoload.php';
+$start=microtime(true);
 
-$container= new ContainerBuilder();
+$cachedContainer= __DIR__.'/cached_container.php';
 
-$loader=new YamlFileLoader($container,new FileLocator(__DIR__.'/config'));
-$loader->load('service.yml');
+if(!file_exists($cachedContainer)){
+    $container= new ContainerBuilder();
+    $container->setParameter('root_dir',__DIR__);
 
-/*$loggerDefinition=new Definition('Monolog\Logger');
-$loggerDefinition->setArguments(array(
-    'main',
-    array(new Reference('logger.stream_handler'))
-));
+    $loader=new YamlFileLoader($container,new FileLocator(__DIR__.'/config'));
+    $loader->load('services.yml');
 
-$loggerDefinition->addMethodCall('pushHandler',array(
-    new Reference('logger.std_out_logger')
-));
+    $container->compile();
 
+    $dumple = new PhpDumper($container);
+    file_put_contents(__DIR__.'/cached_container.php',$dumple->dump());
+}
 
-$loggerDefinition->addMethodCall('debug', array(
-    'The logger just got stated'
-));
+require $cachedContainer;
+$container =new \ProjectServiceContainer();
 
-$container->setDefinition('logger', $loggerDefinition);
-*/x
+runApp($container);
 
-$handlerDefinition= new Definition('Monolog\Handler\StreamHandler');
-$handlerDefinition->setArguments(array(
-    __DIR__.'/dino.log'
-));
+$elapsed= round((microtime(true)-$start)*1000);
+$container->get('logger')->debug('Elapsed Time:'.$elapsed.'ms');
 
-$container->setDefinition('logger.stream_handler',$handlerDefinition);
-
-
-$stdOutLoggerDefinition=new Definition('Monolog\Handler\StreamHandler');
-$stdOutLoggerDefinition->setArguments(array(
-   'php://stdout'
-));
-$container->setDefinition('logger.std_out_logger',$stdOutLoggerDefinition);
- runApp($container);
-function runApp(ContainerBuilder $container)
+function runApp(ContainerInterface $container)
 {
     $container->get('logger')->info('ROOOOOAR');
 

@@ -1800,7 +1800,7 @@
       <argument type="collection">
         <argument type="service">
           <service class="Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider" public="false">
-            <argument>5d01c918949b42.82711057</argument>
+            <argument>5d0348d8e38cc1.00644385</argument>
           </service>
         </argument>
       </argument>
@@ -1919,7 +1919,7 @@
         <argument type="service">
           <service class="Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener" public="false">
             <argument type="service" id="security.context"/>
-            <argument>5d01c918949b42.82711057</argument>
+            <argument>5d0348d8e38cc1.00644385</argument>
             <argument type="service" id="monolog.logger.security" on-invalid="null"/>
             <argument type="service" id="security.authentication.manager"/>
           </service>
@@ -2914,6 +2914,9 @@
       </call>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.debug"/>
+      </call>
+      <call method="debug">
+        <argument>logger CREATED</argument>
       </call>
     </service>
     <service id="swiftmailer.mailer.default.transport" class="Swift_Transport_SpoolTransport">
